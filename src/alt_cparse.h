@@ -1,3 +1,5 @@
+// AN ALTERNATIVE IMPLEMENTATION OF cparse WITHOUT OOP IMPLEMENTATION
+
 #include <iostream>
 #include <string>
 #include <vector>
@@ -7,25 +9,22 @@
 using namespace std;
 
 
-// DECLARE PUBLIC CLASS FOR PARSING ARGUMENTS
-class Argument {
-    public:
-        string arg_long;
-        char arg_short;
-        string default_value;
+typedef vector<vector<string>> array2d_t;
 
-        int init(string x, char y, string z) {
-            arg_long = x;
-            arg_short = y;
-            default_value = z;
-            return 0;
-        }
-};
+
+vector<string> build_argument(string arg_long,
+  string arg_short, string default_value) {
+    vector<string> arguments = {
+        arg_long,
+        arg_short,
+        default_value
+    };
+    return arguments;
+}
 
 
 // PARSE COMMAND LINE ARGUMENTS BY COMPARING THEM TO EXPECTED, BUILT ARGUMENTS
-map<string, string> parse_arguments(vector<Argument> blt,
-  int argc, char **argv) {
+map<string, string> parse_arguments(array2d_t blt, int argc, char **argv) {
 
     // DECLARE TABLE CONTAINING FOUND ARGUMENTS
     map<string, string> arguments;
@@ -40,16 +39,17 @@ map<string, string> parse_arguments(vector<Argument> blt,
             // LONG ARGUMENT FORM (--arg)
             // SHORT ARGUMENT FORM (-a)
             // i IN RANGE OF argv
-            if ((argv[i] == string("--") + blt[j].arg_long) ||
-               (argv[i] == string("-") + blt[j].arg_short)) {
+            if ((argv[i] == string("--") + blt[j][0]) ||
+               (argv[i] == string("-") + blt[j][1])) {
 
                 // DECLARE HUMAN READABLE VARIABLES
-                string key = blt[j].arg_long;
+                string key = blt[j][0];
 
                 // CHECK THAT THE EXPECTED ARGUMENT HASN'T ALREADY BEEN
                 // SATISFIED
                 if (arguments[key] != "") {
-                    cout << "Argument " << argv[i] << " already satisfied\n";
+                    cout << "Argument " << argv[i]
+                         << " already satisfied\n";
                     continue;
                 }
 
@@ -59,7 +59,7 @@ map<string, string> parse_arguments(vector<Argument> blt,
                 if (i + 1 < argc) {
                     value = argv[i + 1];
                 } else {
-                    value = blt[j].default_value;
+                    value = blt[j][2];
                 }
 
                 arguments[key] = value;
